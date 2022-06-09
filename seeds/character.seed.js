@@ -1,5 +1,5 @@
 const Character = require('../models/Character.model')
-const openConnection = require('../db/')
+const openConnection = require('../db/index')
 const mongoose = require('mongoose')
 
 const characters = [
