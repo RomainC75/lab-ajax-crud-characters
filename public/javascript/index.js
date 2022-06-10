@@ -4,6 +4,20 @@
    * You might want to use this template to display each new characters
    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template#examples
    */
+ 
+
+  // !!!!!!!!!!!! //
+  //qs and qa are not used everywhere. There're just here, because I started implementing them after Paulne presentation.
+  //Now I will use them on the next whole next project !
+
+  const qs = (selector, element=document) =>{
+    return element.querySelector(selector)
+  }
+
+  const qsa = (selector, element=document) =>{
+    return element.querySelectorAll(selector)
+  }
+  
   const characterTemplate = document.getElementById('template')
   const characterContainer = document.querySelector('.characters-container')
 
@@ -12,28 +26,32 @@
     displayAll(ans.data)
   });
 
-  document.getElementById('fetch-one').addEventListener('click', async function (event) {
+  const fetchOneButton = qs('#fetch-one')
+  fetchOneButton.addEventListener('click', async function (event) {
+    event.preventDefault()
     const nameToSearch = document.querySelector('input[name="character-name"]').value
-    characterContainer.innerHTML=''
     const {data} = (await axios.get(`http://localhost:5005/characters/${nameToSearch}`))
     characterContainer.innerHTML=''
     if(data.length===0){
       displayError('NOT FOUND !')
+      setAnswerColor(fetchOneButton,false)
       return
     }
     displayOne(data[0],data[0]._id)
+    setAnswerColor(fetchOneButton,true)
   });
 
   document.getElementById('delete-one').addEventListener('click', async function (event) {
     try {
+      characterContainer.innerHTML=''
       const idToDelete = document.querySelector('input[name="character-id-delete"]').value
-      const ans = await axios.delete(`http://localhost:5005/characters/${idToDelete}`)
+      await axios.delete(`http://localhost:5005/characters/${idToDelete}`)
       setAnswerColor(document.getElementById('delete-one'),true)
     } catch (error) {
       setAnswerColor(document.getElementById('delete-one'),false)
     }
-    
   });
+
 const form=document.getElementById('edit-character-form')
   form.addEventListener('submit', function (event) {
     event.preventDefault()
@@ -98,16 +116,18 @@ const form=document.getElementById('edit-character-form')
 
   const displayAll = (data) =>{
     characterContainer.innerHTML=''
-    data.forEach((char,i) => displayOne(char, i))
+    data.forEach(char => displayOne(char))
   }
 
-  const displayOne = (char, id=1) =>{
+  const displayOne = (char) =>{
+    console.log('displayOne : ')
     const clone = characterTemplate.content.cloneNode(true)
-    clone.querySelector('.character-id').innerHTML+=`<span>${id}</span>`
-    clone.querySelector('.name').innerHTML+=`<span>${char.name}</span>`
-    clone.querySelector('.occupation').innerHTML+=`<span>${char.occupation}</span>`
-    clone.querySelector('.cartoon').innerHTML+=`<span>${char.cartoon ? 'true' : 'false'}</span>`
-    clone.querySelector('.weapon').innerHTML+=`<span>${char.weapon}</span>`
+    
+    qs('.character-id',clone).innerHTML+=`<span>${char._id}</span>`
+    qs('.name',clone).innerHTML+=`<span>${char.name}</span>`
+    qs('.occupation',clone).innerHTML+=`<span>${char.occupation}</span>`
+    qs('.cartoon',clone).innerHTML+=`<span>${char.cartoon ? 'true' : 'false'}</span>`
+    qs('.weapon',clone).innerHTML+=`<span>${char.weapon}</span>`
     characterContainer.append(clone)
   }
 
@@ -132,3 +152,26 @@ const form=document.getElementById('edit-character-form')
   const displayErased = () =>{
     characterContainer.innerHTML="<div><p>ERASED !</p></div>"
   }
+
+  
+
+  //...............................;/:
+  //review
+
+
+
+  // const baseUrl = 'http://localhost:5005/api/characters'
+  // const axiosInstance = axios.create({
+  //   baseUrl:"http:/localhost:5055/api/characters"
+  // })
+  // const ans = await axiosInstance.get('/1203943abdf')
+
+  // const APIHandler = { ...axiosInstance }
+  // APIHandler.getFullList = async function () {
+  //   try{
+  //     const {data}= await this.get(`${baseUrl}`)
+  //     return data
+  //   }catch(e){
+  //     console.log(e)
+  //   }
+  // }
